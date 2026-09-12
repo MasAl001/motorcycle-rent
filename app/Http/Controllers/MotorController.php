@@ -12,7 +12,13 @@ class MotorController extends Controller
      */
     public function index()
     {
-        //
+        // BR-3: motor berstatus inactive tidak ditampilkan ke customer
+        $motors = Motor::with('category')
+            ->where('status', '!=', 'inactive')
+            ->latest()
+            ->paginate(9);
+
+        return view('motors.index', compact('motors'));
     }
 
     /**
@@ -36,7 +42,11 @@ class MotorController extends Controller
      */
     public function show(Motor $motor)
     {
-        //
+        abort_if($motor->status === 'inactive', 404);
+
+        $motor->load('category');
+
+        return view('motors.show', compact('motor'));
     }
 
     /**
